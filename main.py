@@ -1,6 +1,6 @@
 from pyspark.sql import *
 from lib.logger import Log4J
-from schema import (
+from lib.schema import (
     actor,
     address,
     category,
@@ -17,13 +17,13 @@ from schema import (
     staff,
     store,
 )
-from utils.tables import load_df_fail_fast, load_df_permissive
-from views.full_location import full_location
-from views.dimmovie import create_dimmovies
-from views.dimstore import create_dimstore
-from views.dimcustomer import create_dimcustomer
-from views.dimdate import create_dimdate
-from views.factsales import create_factsales
+from lib.utils.tables import load_df_fail_fast, load_df_permissive
+from lib.views.full_location import full_location
+from lib.views.dimmovie import create_dimmovies
+from lib.views.dimstore import create_dimstore
+from lib.views.dimcustomer import create_dimcustomer
+from lib.views.dimdate import create_dimdate
+from lib.views.factsales import create_factsales
 
 
 if __name__ == "__main__":
@@ -76,18 +76,17 @@ if __name__ == "__main__":
     dimmovies = create_dimmovies(filmCSVDF, languageCSVDF)
     dimmovies.show()
 
+    # Simple way to combine the city and country into a dataframe
     combined_full_location = full_location(cityCsvDF, countryCSVDF, addressCsvDF)
 
     dimstore = create_dimstore(staffCSVDF, storeCSVDF, combined_full_location)
     dimstore.show()
 
-    dimcustomer = create_dimcustomer(combined_full_location, customerCSVDF, rentalCSVDF)
+    dimcustomer = create_dimcustomer(combined_full_location, customerCSVDF)
     dimcustomer.show()
 
-    dimdate = create_dimdate(rentalCSVDF)
+    dimdate = create_dimdate(paymentCSVDF)
     dimdate.show()
 
-    factsales = create_factsales(
-        dimdate, dimcustomer, dimmovies, dimstore, paymentCSVDF
-    )
+    factsales = create_factsales(rentalCSVDF, inventoryCSVDF, paymentCSVDF)
     factsales.show()

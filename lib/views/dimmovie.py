@@ -1,26 +1,27 @@
-from pyspark.sql.functions import monotonically_increasing_id
-
-
 def create_dimmovies(
-    table1,
-    table2,
+    film,
+    language,
 ):
-    join_expr = table1.language_id == table2.language_id
+    """
+    film: the film dataframe filmCSVDF in main.py
+    language: the language dataframe called languageCSVDF in main.py
+
+    """
+    join_expr = film.language_id == language.language_id
     dimmovies = (
-        table1.join(table2, join_expr, "inner")
+        film.join(language, join_expr, "inner")
         .drop(
             "replacement_cost",
             "fulltext",
             "last_update",
             "rental_rate",
             "original_language_id",
-            table2.language_id,
-            table2.language_id,
+            film.language_id,
+            language.language_id,
         )
         .withColumnRenamed("name", "language")
-        .withColumn("movie_key", monotonically_increasing_id())
     ).select(
-        "movie_key",
+        film.film_id.alias("movie_key"),
         "film_id",
         "title",
         "description",
