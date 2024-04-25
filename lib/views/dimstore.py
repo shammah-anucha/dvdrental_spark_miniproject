@@ -1,3 +1,6 @@
+from pyspark.sql.functions import current_timestamp
+
+
 def create_dimstore(staff, store, location):
     """
     location: A dataframe containing the city_id, city and country found in full_location.py
@@ -33,5 +36,7 @@ def create_dimstore(staff, store, location):
         "postal_code",
         "manager_first_name",
         "manager_last_name",
+        current_timestamp().alias("start_date"),
+        current_timestamp().alias("end_date"),
     )
     return dimstore
